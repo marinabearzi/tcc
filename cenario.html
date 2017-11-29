@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<script type="text/javascript" src="https://fastcdn.org/FileSaver.js/1.1.20151003/FileSaver.js" ></script>
+<script type="text/javascript">
+    function w3_open() {
+        document.getElementById("mySidebar").style.display = "block";
+        document.getElementById("myOverlay").style.display = "block";
+}
+    function w3_close() {
+        document.getElementById("mySidebar").style.display = "none";
+        document.getElementById("myOverlay").style.display = "none";
+}
+</script>
+<head><Title>Criação do cenário</Title></head>
+<style type="text/css">
+body{
+    overflow-x: hidden;
+}
+td{
+    width: 25px;
+    height: 25px;
+    /*border-radius: 150px;*/
+    border: 1px #e0e0e0 solid;
+}
+.node{
+    border-radius: 150px;
+}
+table{
+    border: 1px black solid;   
+}
+.table2 tr td{
+    border: 1px black solid;    
+}
+.divTable{
+    height: 250px;
+    overflow:scroll;
+    margin-bottom: 20px;
+}
+.nodeTable{
+    text-align: center;
+}
+.edgeTable{
+    text-align: center;
+    margin-top: 10px;
+}
+input{
+    text-align: center;
+}
+.w3-bar .w3-bar-item {
+    padding: 8px 16px;
+    float: left;
+    width: auto;
+    border: none;
+    outline: none;
+    display: block;
+}
+.w3-padding-16 {
+    padding-top: 16px!important;
+    padding-bottom: 16px!important;
+}
+</style>
+
+</head>
+
+<body>
+    <div class="w3-sidebar w3-light-grey w3-bar-block w3-animate-left" style="display:none;z-index:5;width:27.5%;overflow-x: hidden;" id="mySidebar">
+        <div class="w3-bar w3-dark-grey">
+            <span class="w3-bar-item w3-padding-16">Menu</span>
+            <button onclick="w3_close()" class="w3-bar-item w3-button w3-right w3-padding-16" title="close Sidebar">x</button>
+        </div>
+        <img src="logo.png" style="width: 350px;margin-bottom: 10px; margin-left: 12px">
+        <a href="home.html" class="w3-bar-item w3-button w3-green">Home</a>
+        <a href="cenario.html" class="w3-bar-item w3-button">nod.xml e edg.xml</a>
+        <a href="net.html" class="w3-bar-item w3-button">net.xml</a>
+        <a href="rou.html" class="w3-bar-item w3-button">rou.xml</a>
+        <a href="sumocfg.html" class="w3-bar-item w3-button">sumocfg</a>
+        <a href="ini.html" class="w3-bar-item w3-button">omnetpp.ini</a>
+        <a href="launchd.html" class="w3-bar-item w3-button">launchd.xml</a>
+        <a href="tracicommandinterface.html" class="w3-bar-item w3-button">TraCICommandInterface</a>
+        <a href="tracimobility.html" class="w3-bar-item w3-button">TraCIMobility</a>
+    </div>
+
+    <div class="w3-overlay w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" id="myOverlay"></div>
+
+    <div><button class="w3-button w3-white w3-xxlarge" onclick="w3_open()">&#9776;</button> </div>
+
+    <div class="row">
+     <div class="col-sm-5">
+        <div style="margin-top: -50px; margin-left: 100px; margin-bottom: 10px;">Project name: <input type="text" id="fileName"></div>
+        <button style="margin-top: 12px; margin-left: 428px" onclick="undo()"><i class="fa fa-undo"></i>  Undo</button>
+        <table id="myTable">
+        </table> 
+    </div>
+    <div class="col-sm-7">
+        <div class="divTable">
+            <table id="myTable2" class="nodeTable table table-sm">
+                <tr class="table-active">
+                    <td>Node</td>
+                    <td>X</td>
+                    <td>Y</td>
+                    <td>Traffic light?</td>
+                </tr>
+            </table> 
+        </div>
+        <button type="button" class="btn btn-success" onclick="createNodeFile()">Create Node File</button>
+        <div class="divTable">
+            <table id="myTable3" class="edgeTable table table-sm">
+                <tr class="table-active">
+                    <td>Node1</td>
+                    <td>Node2</td>
+                    <td>Edge</td>
+                    <td>Two way?</td>
+                    <td>Speed</td>
+                </tr>
+            </table> 
+        </div>
+        <button type="button" class="btn btn-success" onclick="createEdgeFile()">Create Edge File</button>
+    </div> 
+</div>
+</body>
+<script type='text/javascript'>
+    var cells = [];
+    var nodes = [];
+    var nodesCount = 0;
+    var cellAux = "";
+    var count = 1;
+    var state = "";
+    var states = [];
+    myFunction();
+    function myFunction() {
+
+        var table;
+
+        var row;
+
+        var cell1;
+
+        var col = 20;
+        var lin = 20;
+        table = document.getElementById("myTable"); 
+        for (var i=0; i<col; i++){
+            row = table.insertRow(i);
+            for (var j=0; j<lin; j++){
+                row.id = 'row_' + i
+                cell1 = row.insertCell(j);
+                cell1.id = 'node_' + (j) + '_' + (i);
+                cell1.setAttribute("class", "node")
+                cell1.setAttribute("onclick", "changeColor("+ cell1.id+")");
+            }
+        }
+    }
+
+    function changeColor(cell){
+        if(cell.style.backgroundColor == "aquamarine"){
+            cell.setAttribute("style", "background-color: red");    
+        } else {
+            cell.setAttribute("style", "background-color: aquamarine");
+        }
+        fillNodeTable(cell.id)
+        fillObject(cell.id)
+    }
+
+    function fillNodeTable(cellId){
+        var duplicate = false
+        for(node of nodes){
+            if(node == cellId){
+                duplicate = true
+            }
+        }
+        if(!duplicate){
+            nodes.push(cellId)
+            nodesCount++
+            createNodeTable(cellId)
+        }
+        state = "node"
+    }
+
+    function createNodeTable(cellId){
+        var table = document.getElementById('myTable2');
+        var tr = document.createElement('tr');   
+
+        var td1 = document.createElement('td');
+        var td2 = document.createElement('td');
+        var td3 = document.createElement('td');
+        var td4 = document.createElement('td');
+
+        var text1 = document.createTextNode(cellId);
+
+        var input1 = document.createElement('input')
+        var input2 = document.createElement('input')
+        var input3 = document.createElement('input')
+
+        input1.id = "x_" + cellId
+        input2.id = "y_" + cellId
+        input3.id = "traffic_light_" + cellId
+
+        var fields = cellId.split('_')
+
+        input1.setAttribute("value", "+" + fields[1] * 25 + ".0")
+        input2.setAttribute("value", "+" + (19 - fields[2])* 25 + ".0")
+        input3.setAttribute("type", "checkbox")
+        td2.appendChild(input1)
+        td3.appendChild(input2)
+        td4.appendChild(input3)
+
+        td1.appendChild(text1);
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tr.appendChild(td3);
+        tr.appendChild(td4);
+
+        table.appendChild(tr);
+
+        state = "node"
+        states.push("node")
+        console.log("state", state)
+        console.log("cells", cells)
+        console.log("nodes", nodes)
+        console.log("nodesCount", nodesCount)
+        console.log("count", count)
+    }
+
+    function fillObject(cellId){
+
+        if (cells[count] == null && cellAux == ""){
+            cellAux = cellId
+        } else if(cells[count] == null && cellAux != "" && cellAux != cellId){
+            var duplicate = false
+            for (cell of cells){
+                if( (cell.firstCell == cellAux && cell.secondCell == cellId) || (cell.secondCell == cellAux && cell.firstCell == cellId) ){
+                    duplicate = true
+                }
+            }
+            if(!duplicate){
+                cells.push({firstCell: cellAux, secondCell: cellId})
+                var div1 = document.getElementById(cellAux)
+                var div2 = document.getElementById(cellId)
+                connect(div1, div2, "#000", 2)
+                createEdgeTable(cellAux, cellId)
+                count ++
+                cellAux = ""
+            } else {
+                cellAux = ""
+            }
+        }
+    }
+
+    function getOffset( el ) {
+        var rect = el.getBoundingClientRect();
+        return {
+            left: rect.left + window.pageXOffset,
+            top: rect.top + window.pageYOffset,
+            width: rect.width || el.offsetWidth,
+            height: rect.height || el.offsetHeight
+        };
+    }
+
+function connect(div1, div2, color, thickness) { // draw a line connecting elements
+    var off1 = getOffset(div1);
+    var off2 = getOffset(div2);
+    // bottom right
+    var x1 = off1.left + off1.width/2;
+    var y1 = off1.top + off1.height/2;
+    // top right
+    var x2 = off2.left + off2.width/2;
+    var y2 = off2.top + off2.height/2;
+    // distance
+    var length = Math.sqrt(((x2-x1) * (x2-x1)) + ((y2-y1) * (y2-y1)));
+    // center
+    var cx = ((x1 + x2) / 2) - (length / 2);
+    var cy = ((y1 + y2) / 2) - (thickness / 2);
+    // angle
+    var angle = Math.atan2((y1-y2),(x1-x2))*(180/Math.PI);
+    // make hr
+    var htmlLine = "<div id='line_"+ div1.id + "-" + div2.id +"' style='padding:0px; margin:0px; height:" + thickness + "px; background-color:" + color + "; line-height:1px; position:absolute; left:" + cx + "px; top:" + cy + "px; width:" + length + "px; -moz-transform:rotate(" + angle + "deg); -webkit-transform:rotate(" + angle + "deg); -o-transform:rotate(" + angle + "deg); -ms-transform:rotate(" + angle + "deg); transform:rotate(" + angle + "deg);' />";
+    //
+    // alert(htmlLine);
+    document.body.innerHTML += htmlLine;
+}
+
+function createEdgeTable(cell1, cell2){
+    var table = document.getElementById('myTable3');
+    var tr = document.createElement('tr');   
+
+    var td1 = document.createElement('td');
+    var td2 = document.createElement('td');
+    var td3 = document.createElement('td');
+    var td4 = document.createElement('td');
+    var td5 = document.createElement('td');
+
+    var text1 = document.createTextNode(cell1);
+    var text2 = document.createTextNode(cell2);
+
+    var input1 = document.createElement('input')
+    var input2 = document.createElement('input')
+    var input3 = document.createElement('input')
+
+    input1.setAttribute("value", "edge_" + cell1 + "-" + cell2)
+    input1.id = "edge_" + cell1 + "-" + cell2
+    input2.id = "two_way_" + cell1 + "-" + cell2
+    input2.setAttribute("type", "checkbox")
+    input3.id = "speed_" + cell1 + "-" + cell2
+    td3.appendChild(input1)
+    td4.appendChild(input2)
+    td5.appendChild(input3)
+
+    td1.appendChild(text1);
+    td2.appendChild(text2);
+    tr.appendChild(td1);
+    tr.appendChild(td2);
+    tr.appendChild(td3);
+    tr.appendChild(td4);
+    tr.appendChild(td5);
+
+    table.appendChild(tr);
+
+    state = "edge"
+    states.push("edge")
+    console.log("state", state)
+    console.log("cells", cells)
+    console.log("nodes", nodes)
+    console.log("nodesCount", nodesCount)
+    console.log("count", count)
+}
+
+function undo(){
+    console.log("state", state)
+    if(state == "node"){
+        var lastNode = nodes.pop()
+        var cell = cells[count-2]
+        if(cell && lastNode == cell.secondCell){
+            nodes.push(lastNode)
+            var node = document.getElementById(lastNode)
+            node.setAttribute("style", "background-color: aquamarine");
+            cellAux = lastNode
+        } else {
+            cellAux = ""
+            nodesCount--
+            var table = document.getElementById("myTable2");
+            var rowCount = table.rows.length;
+            table.deleteRow(rowCount -1);
+            var node = document.getElementById(lastNode)
+            node.setAttribute("style", "background-color: white");
+        }
+        state = "edge"
+    } else if (state == "edge"){
+        var lastEdge = cells.pop()
+        count--
+        var table = document.getElementById("myTable3");
+        var rowCount = table.rows.length;
+        table.deleteRow(rowCount -1);
+        var lastNode = nodes.pop()
+        nodesCount--
+        var lastRemainingNode = nodes[nodesCount-1]
+        cellAux = lastRemainingNode
+        document.getElementById("line_"+lastEdge.firstCell+"-"+lastEdge.secondCell).remove()
+
+        var table = document.getElementById("myTable2");
+        var rowCount = table.rows.length;
+        table.deleteRow(rowCount -1);
+        var node = document.getElementById(lastNode)
+        node.setAttribute("style", "background-color: white");
+        state = "node"
+    }
+}
+
+function element(name,content,attributes){
+    var att_str = ''
+    if (attributes) { // tests false if this arg is missing!
+        att_str = formatAttributes(attributes)
+    }
+    var xml
+    if (!content){
+        xml='<' + name + att_str + '/>'
+    }
+    else {
+        xml='<' + name + att_str + '>' + content + '</'+name+'>'
+    }
+    return xml
+}
+var APOS = "'"; QUOTE = '"'
+var ESCAPED_QUOTE = {  }
+ESCAPED_QUOTE[QUOTE] = '&quot;'
+ESCAPED_QUOTE[APOS] = '&apos;'
+   
+/*
+   Format a dictionary of attributes into a string suitable
+   for inserting into the start tag of an element.  Be smart
+   about escaping embedded quotes in the attribute values.
+*/
+function formatAttributes(attributes) {
+    var att_value
+    var apos_pos, quot_pos
+    var use_quote, escape, quote_to_escape
+    var att_str
+    var re
+    var result = ''
+   
+    for (var att in attributes) {
+        att_value = attributes[att]
+        
+        // Find first quote marks if any
+        apos_pos = att_value.indexOf(APOS)
+        quot_pos = att_value.indexOf(QUOTE)
+       
+        // Determine which quote type to use around 
+        // the attribute value
+        if (apos_pos == -1 && quot_pos == -1) {
+            att_str = ' ' + att + "='" + att_value +  "'"
+            result += att_str
+            continue
+        }
+        
+        // Prefer the single quote unless forced to use double
+        if (quot_pos != -1 && quot_pos < apos_pos) {
+            use_quote = APOS
+        }
+        else {
+            use_quote = QUOTE
+        }
+   
+        // Figure out which kind of quote to escape
+        // Use nice dictionary instead of yucky if-else nests
+        escape = ESCAPED_QUOTE[use_quote]
+        
+        // Escape only the right kind of quote
+        re = new RegExp(use_quote,'g')
+        att_str = ' ' + att + '=' + use_quote + 
+            att_value.replace(re, escape) + use_quote
+        result += att_str
+    }
+    return result
+}
+function createNodeFile() {  
+    var filename = document.getElementById("fileName").value 
+
+    var objVehicleType = []
+    var attVehicleType
+    for (var a = 0; a < nodes.length; a++){
+        var traffic_light 
+        if(document.getElementById("traffic_light_" + nodes[a]).checked){
+            objVehicleType.push({
+                id: nodes[a],
+                x: document.getElementById("x_" + nodes[a]).value,
+                y: document.getElementById("y_" + nodes[a]).value,
+                type: "traffic_light",
+            });
+        } else {
+            objVehicleType.push({
+                id: nodes[a],
+                x: document.getElementById("x_" + nodes[a]).value,
+                y: document.getElementById("y_" + nodes[a]).value,
+            });
+        }
+        
+        if(a == 0){
+            attVehicleType = ( "\n" + "\t" + element('node', null, objVehicleType[a]) + "\n")
+        } else{
+            attVehicleType += ("\t" + element('node', null, objVehicleType[a]) + "\n")
+        }
+    }
+
+    var file = new File([element('nodes', attVehicleType, null)], "teste.xml", {type: "application/xml;charset==utf-8"});
+    saveAs(file, filename + ".nod.xml");
+} 
+
+function createEdgeFile() {   
+
+    var filename = document.getElementById("fileName").value
+    var objVehicleType = []
+    var attVehicleType
+    for (var a = 0; a < cells.length; a++){
+        var speed
+        if(document.getElementById("speed_" + cells[a].firstCell + "-" + cells[a].secondCell).value != ""){
+            if(document.getElementById("two_way_"+ cells[a].firstCell + "-" + cells[a].secondCell).checked ) {
+                objVehicleType.push({
+                    id: document.getElementById("edge_" + cells[a].firstCell + "-" + cells[a].secondCell).value,
+                    from: cells[a].firstCell,
+                    to: cells[a].secondCell,
+                    speed: document.getElementById("speed_" + cells[a].firstCell + "-" + cells[a].secondCell).value,
+                }, {
+                    id: document.getElementById("edge_" + cells[a].firstCell + "-" + cells[a].secondCell).value + "_",
+                    from: cells[a].secondCell,
+                    to: cells[a].firstCell,
+                    speed: document.getElementById("speed_" + cells[a].firstCell + "-" + cells[a].secondCell).value,
+                });
+            } else{
+               objVehicleType.push({
+                   id: document.getElementById("edge_" + cells[a].firstCell + "-" + cells[a].secondCell).value,
+                   from: cells[a].firstCell,
+                   to: cells[a].secondCell,
+                   speed: document.getElementById("speed_" + cells[a].firstCell + "-" + cells[a].secondCell).value,
+               }); 
+            }
+        } else {
+            if(document.getElementById("two_way_"+ cells[a].firstCell + "-" + cells[a].secondCell).checked ){
+                objVehicleType.push({
+                    id: document.getElementById("edge_" + cells[a].firstCell + "-" + cells[a].secondCell).value,
+                    from: cells[a].firstCell,
+                    to: cells[a].secondCell,
+                }, {
+                    id: document.getElementById("edge_" + cells[a].firstCell + "-" + cells[a].secondCell).value + "_",
+                    from: cells[a].secondCell,
+                    to: cells[a].firstCell,
+                });
+            } else{
+               objVehicleType.push({
+                   id: document.getElementById("edge_" + cells[a].firstCell + "-" + cells[a].secondCell).value,
+                   from: cells[a].firstCell,
+                   to: cells[a].secondCell,
+               }); 
+            }
+        }
+    }
+
+    for(var a = 0; a < objVehicleType.length; a++){
+        if(a == 0){
+            attVehicleType = ( "\n" + "\t" + element('edge', null, objVehicleType[a]) + "\n")
+        } else{
+            attVehicleType += ("\t" + element('edge', null, objVehicleType[a]) + "\n")
+        }
+    }
+
+    var file = new File([element('edges', attVehicleType, null)], "teste.xml", {type: "application/xml;charset==utf-8"});
+    saveAs(file, filename + ".edg.xml");
+} 
+
+
+
+</script>
+</html>
